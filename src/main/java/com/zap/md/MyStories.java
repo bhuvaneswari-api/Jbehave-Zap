@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
-import com.zap.md.steps.ZapHomePageSteps;
+import com.zap.md.steps.*;
 import org.jbehave.core.Embeddable;
 import org.jbehave.core.configuration.Configuration;
 import org.jbehave.core.configuration.Keywords;
@@ -28,13 +28,15 @@ import org.jbehave.core.reporters.StoryReporterBuilder;
 import org.jbehave.core.steps.*;
 import org.jbehave.core.steps.ParameterConverters.DateConverter;
 import org.jbehave.core.steps.ParameterConverters.ExamplesTableConverter;
+import org.openqa.selenium.WebDriver;
 
 
 public class MyStories extends JUnitStories {
 
     public MyStories() {
+        //Default configuration to run testcases
         configuredEmbedder().embedderControls().doGenerateViewAfterStories(true).doIgnoreFailureInStories(true)
-                .doIgnoreFailureInView(true).useThreads(2).useStoryTimeoutInSecs(60);
+                .doIgnoreFailureInView(true).useThreads(1).useStoryTimeoutInSecs(60);
     }
 
     @Override
@@ -54,6 +56,7 @@ public class MyStories extends JUnitStories {
         parameterConverters.addConverters(new DateConverter(new SimpleDateFormat("yyyy-MM-dd")),
                 new ExamplesTableConverter(examplesTableFactory));
 
+        // This is to generate report under folder target/jbehave/**ur_folder_structure_story_name.html
         Properties resources = new Properties();
         resources.put("decorateNonHtml", "true");
         return new MostUsefulConfiguration()
@@ -75,15 +78,18 @@ public class MyStories extends JUnitStories {
         return new Locale("en");
     }
 
+    // Initialize all the StepsClasses here
     @Override
     public InjectableStepsFactory stepsFactory() {
-        return new InstanceStepsFactory(configuration(), new ZapHomePageSteps());
+        return new InstanceStepsFactory(configuration(),new CommonSteps(), new ZapHomePageSteps(),
+                new ZapSearchPageSteps(), new ZapProductDetailsPageSteps(), new ZapCartPageSteps());
     }
 
+    // Provide The testcase name - that is story file name in the below method to run it
     @Override
     protected List<String> storyPaths() {
         return new StoryFinder().findPaths(codeLocationFromClass(this.getClass()),
-                "**/*.story",
+                "**/Story_Zap_LaunchHomePageandVerifyDetails.story",
                 "");
 
     }
